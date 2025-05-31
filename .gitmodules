@@ -1,4 +1,4 @@
 [submodule "kattis_cli"]
 	path = kattis_cli
-	url = git@github.com:Kattis/kattis-cli.git
-	branch = master
+	url = git@github.com:E-M-Bailey/kattis-cli.git
+	branch = main
