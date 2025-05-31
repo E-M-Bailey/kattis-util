@@ -1,4 +1,3 @@
-pip
 
-lxml
-requests
+
+-r kattis_cli/requirements.txt

@@ -6,10 +6,11 @@
 cd -- "$(dirname "$0")"
 test -f .kattis-util-root || { >&2 echo "couldn't find .kattis-util-root file" ; exit 1 ; }
 
-test -d ./.venv || /usr/bin/env python -m venv ./.venv || { >&2 echo "couldn't find or create venv" ; exit 1 ; }
-./.venv/bin/python -m pip install --upgrade --requirement ./requirements.txt || { >&2 echo "couldn't install pip requirements" ; exit 1 ; }
+git submodule init
+git pull
+git -C ./kattis_cli pull
 
-git submodule update --init --recursive --remote || { >&2 echo "couldn't update submodules" ; exit 1 ; }
-git pull --recurse-submodule
+test -d ./.venv || /usr/bin/env python -m venv ./.venv || { >&2 echo "couldn't find or create venv" ; exit 1 ; }
+./.venv/bin/python -m pip install --upgrade pip --requirement ./requirements.txt || { >&2 echo "couldn't install pip requirements" ; exit 1 ; }
 
 exit 0
