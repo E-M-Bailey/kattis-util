@@ -1,0 +1,18 @@
+# Please save this file as .kattisrc in your home directory.
+# This file includes a secret token that allows you to log in.
+# DO NOT SHARE IT WITH ANYONE ELSE.
+# If someone gets access to this token, please revoke it by changing your KATTIS password.
+
+[user]
+username: johndoe
+token: pi31415926535897932384626433832795028841971693993751058209749etc
+
+[kattis]
+hostname: open.kattis.com
+loginurl: https://open.kattis.com/login
+submissionurl: https://open.kattis.com/submit
+submissionsurl: https://open.kattis.com/submissions
+contestsurl: https://open.kattis.com/contests
+challengeurl: https://open.kattis.com/challenge
+usersurl: https://open.kattis.com/users
+ranklisturl: https://open.kattis.com/ranklist
