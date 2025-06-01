@@ -212,7 +212,6 @@ class Kattis:
     ### basic urls ###
 
     def login_url(self):
-        print(self.get_url('loginurl', 'login'))
         return self.get_url('loginurl', 'login')
 
     def logout_url(self):
