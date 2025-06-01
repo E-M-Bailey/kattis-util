@@ -1,3 +1,4 @@
 ipykernel
+requests
 
 --requirement kattis_cli/requirements.txt
