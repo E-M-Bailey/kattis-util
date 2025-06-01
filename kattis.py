@@ -6,10 +6,11 @@ from functools import total_ordering
 from pathlib import Path
 from typing import Literal
 
-import requests
-from requests import Request, Response
+from requests import Request
 
 import kattis_cli.submit as cli
+
+from response_cache import ResponseCache
 
 type UserTab = Literal['favourite', 'problems',
                        'submissions', 'settings', 'email', 'account']
@@ -17,22 +18,6 @@ type UserTab = Literal['favourite', 'problems',
 type ProblemTab = Literal['edit', 'metadata', 'submissions']
 
 type ContestTab = Literal['contest', 'standings', 'problems', 'teams', 'rules']
-
-
-class RequestCache:
-    def __init__(self):
-        self.cache: dict[Request, Response] = {}
-
-    def __contains__(self, req: Request):
-        return req in self.cache
-
-    def invalidate(self, req: Request):
-        self.cache.pop(req, None)
-
-    def send(self, req: Request, use_cached: bool = True):
-        if not use_cached or req not in self:
-            self.cache[req] = requests.session().send(req.prepare())
-        return self.cache[req]
 
 
 @total_ordering
@@ -191,6 +176,67 @@ class Kattis:
             hostname = self.config.get(section, 'hostname')
         return self.get_cfg(option, f'https://{hostname}/{default}', section)
 
+    ### response cache ###
+
+    @property
+    def cache(self):
+        if not hasattr(self, '_cache'):
+            self._cache = ResponseCache()
+        return self._cache
+
+    def get(self,
+            url: str,
+            data: dict[str, str] | None = None,
+            params: dict[str, str] | None = None,
+            use_cached: bool = True):
+        req = Request(method='get',
+                      url=url,
+                      headers=Kattis.HEADERS,
+                      data={} if data is None else data,
+                      params={} if params is None else params,
+                      cookies=self.cookies)
+        return self.cache.send(req, use_cached)
+
+    ### login ###
+
+    def login(self, use_cached: bool = True):
+        # See cli.main
+        resp = self.cache.send(self.login_request, use_cached)
+        if resp.status_code == 403:
+            raise Exception(f'403: bad credentials for {self.username}')
+        elif resp.status_code == 404:
+            raise Exception(f'404: incorrect login URL {self.login_url()}')
+        elif resp.status_code != 200:
+            raise Exception(f'login failed with status {resp.status_code}')
+        else:
+            return resp
+
+    def is_logged_in(self):
+        return self.login_request in self.cache
+
+    def logout(self):
+        return self.cache.invalidate(self.login_request)
+
+    @property
+    def login_request(self):
+        # See cli.login
+        if self.password is None and self.token is None:
+            raise cli.ConfigError('password and token both missing')
+        data = {'user': self.username, 'script': 'true'}
+        if self.password is not None:
+            data['password'] = self.password
+        if self.token is not None:
+            data['token'] = self.token
+        return Request('post', url=self.login_url(), data=data, headers=Kattis.HEADERS)
+
+    @property
+    def login_response(self):
+        return self.login(use_cached=True)
+
+    @property
+    def cookies(self):
+        return self.login_response.cookies
+
     ### basic info ###
 
     @property
@@ -308,68 +354,3 @@ class Kattis:
     ### url params ###
 
     ### requests ###
-
-    @property
-    def cache(self):
-        if not hasattr(self, '_cache'):
-            self._cache = RequestCache()
-        return self._cache
-
-    def get(self,
-            url: str,
-            data: dict[str, str] | None = None,
-            params: dict[str, str] | None = None,
-            use_cached: bool = True):
-        req = Request(method='get',
-                      url=url,
-                      headers=Kattis.HEADERS,
-                      data={} if data is None else data,
-                      params={} if params is None else params,
-                      cookies=self.cookies)
-        return self.cache.send(req, use_cached)
-
-    ### login ###
-
-    def login(self, use_cached: bool = True):
-        # See cli.main
-        resp = self.cache.send(self.login_request, use_cached)
-        if resp.status_code == 403:
-            raise Exception(f'403: bad credentials for {self.username}')
-        elif resp.status_code == 404:
-            raise Exception(f'404: incorrect login URL {self.login_url()}')
-        elif resp.status_code != 200:
-            raise Exception(f'login failed with status {resp.status_code}')
-        else:
-            return resp
-
-    def is_logged_in(self):
-        return self.login_request in self.cache
-
-    def logout(self):
-        return self.cache.invalidate(self.login_request)
-
-    @property
-    def login_request(self):
-        # See cli.login
-        if self.password is None and self.token is None:
-            raise cli.ConfigError('password and token both missing')
-        data = {'user': self.username, 'script': 'true'}
-        if self.password is not None:
-            data['password'] = self.password
-        if self.token is not None:
-            data['token'] = self.token
-        return Request('post', url=self.login_url(), data=data, headers=Kattis.HEADERS)
-
-    @property
-    def login_response(self):
-        return self.login(use_cached=True)
-
-    @property
-    def cookies(self):
-        return self.login_response.cookies
-
-    @property
-    def problem_cache(self):
-        if not hasattr(self, '_problem_cache'):
-            self._problem_cache: dict[str, Problem] = {}
-        return self._problem_cache
