@@ -7,12 +7,31 @@
 username: johndoe
 token: pi31415926535897932384626433832795028841971693993751058209749etc
 
+# Any of these may be omitted, and will default to the values here (possibly with a different hostname)
+# Most of these are not useful, but are here for completeness anyway
+
 [kattis]
 hostname: open.kattis.com
 loginurl: https://open.kattis.com/login
+logouturl: https://open.kattis.com/logout
 submissionurl: https://open.kattis.com/submit
 submissionsurl: https://open.kattis.com/submissions
+diffurl: https://open.kattis.com/diff/submissions
+problemsurl: https://open.kattis.com/contests
 contestsurl: https://open.kattis.com/contests
+pastcontestsurl: https://open.kattis.com/past-contests
 challengeurl: https://open.kattis.com/challenge
 usersurl: https://open.kattis.com/users
 ranklisturl: https://open.kattis.com/ranklist
+affiliationsurl: https://open.kattis.com/affiliations
+countriesurl: https://open.kattis.com/countries
+authorsurl: https://open.kattis.com/problem-authors
+sourcesurl: https://open.kattis.com/problem-sources
+jobsurl: https://open.kattis.com/jobs
+relayurl: https://open.kattis.com/relay
+languagesurl: https://open.kattis.com/languages
+infourl: https://open.kattis.com/info
+policiesurl: https://open.kattis.com/policies
+searchurl: https://open.kattis.com/search
+supporturl: https://open.kattis.com/supporter
+requestaffiliationurl: https://open.kattis.com/request-affiliation
