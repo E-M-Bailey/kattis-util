@@ -1,6 +1,8 @@
 **/*.kattisrc*
 !/example.kattisrc
 
+**/.vscode/
+
 # GitHub default Python .gitignore:
 
 # Byte-compiled / optimized / DLL files
